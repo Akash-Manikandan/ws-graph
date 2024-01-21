@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.svelte-flow__attribution {
+    display: none;
+}
+
+.svelte-flow__node {
+    word-break: break-all;
+}
+
+.svelte-flow__nodes {
+    font-size: 10px;
+}

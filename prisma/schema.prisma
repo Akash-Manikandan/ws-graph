@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Node {
+  id          Int      @id @default(autoincrement())
+  url         String   @unique
+  pagerank    Int      @default(0)
+  level       Int      @default(0)
+  content     Content?
+  isBaseUrl   Boolean  @default(false)
+  pruned      Boolean  @default(false)
+
+  source      Edge[]   @relation("source")
+  destination Edge[]   @relation("destination")
+}
+
+model Edge {
+  id          Int  @id @default(autoincrement())
+  source      Node @relation(name: "source", fields: [sourceNodeId], references: [id])
+  destination Node @relation(name: "destination", fields: [destinationNodeId], references: [id])
+
+  sourceNodeId      Int
+  destinationNodeId Int
+
+  @@unique([sourceNodeId, destinationNodeId], name: "uniqueEdge")
+  @@index([sourceNodeId])
+  @@index([destinationNodeId])
+}
+
+model Content {
+  id      Int    @id @default(autoincrement())
+  content String @db.LongText
+  node    Node   @relation(fields: [nodeId], references: [id])
+  nodeId  Int    @unique
+}
