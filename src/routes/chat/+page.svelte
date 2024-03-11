@@ -1,5 +1,19 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { Chat } from './types';
+
+	let maxWidth = 0;
+
+	onMount(() => {
+		maxWidth = Math.floor(window.innerWidth * 0.84);
+		const updateMaxWidth = () => {
+			maxWidth = Math.floor(window.innerWidth * 0.84);
+		};
+		window.addEventListener('resize', updateMaxWidth);
+		return () => {
+			window.removeEventListener('resize', updateMaxWidth);
+		};
+	});
 
 	let innerHeight: number;
 	let question: string;
@@ -31,9 +45,40 @@
 
 	<div class="h-full w-full flex flex-col">
 		{#each Array(40) as _, index (index)}
-			<div class={'flex w-full gap-3 p-2 ' + (index % 2 === 0 ? 'justify-end' : 'justify-start')}>
-				<p>{index + 1}</p>
-				<p>message</p>
+			<div class={'flex w-full p-2 ' + (index % 2 === 0 ? 'justify-end ' : 'justify-start ')}>
+				<div
+					class={'flex flex-col w-fit max-w-96 p-2 gap-3 rounded-xl ' +
+						(index % 2 === 0
+							? 'bg-[#111A21] text-white items-end'
+							: ' bg-[#EDABEF] text-black items-start')}
+					style="max-width: {maxWidth}px;"
+				>
+					<div class="text-2xl font-bold">
+						{#if index % 2 === 0}
+							<p class="">User</p>
+						{:else}
+							<p class="">SVCE AI</p>
+						{/if}
+					</div>
+					<p class="text-xl">
+						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin laoreet rhoncus est.
+						Curabitur a massa pulvinar, interdum nibh non, sodales turpis. Suspendisse pharetra
+						hendrerit efficitur. Mauris in enim elit. Cras purus magna, pulvinar et leo id,
+						elementum scelerisque ipsum. Nullam ut blandit sem, a auctor ante. Ut aliquam ultrices
+						mollis. In quis ligula ipsum. Vestibulum ultrices cursus nibh non accumsan. Aenean ac
+						pulvinar ipsum, sed lobortis lectus. Donec elementum sapien et malesuada rhoncus.
+						Curabitur tempus lacinia enim, a venenatis urna elementum ut. Donec condimentum dolor
+						nec accumsan fringilla. Proin molestie id nisi ut vehicula. Nunc tincidunt dapibus
+						maximus. Mauris porta convallis sem id euismod. Praesent vehicula ut lorem nec
+						scelerisque. Morbi quis ex et turpis consectetur efficitur. Ut ac felis faucibus,
+						ullamcorper metus vitae, auctor erat. Duis sed tellus sit amet mi scelerisque
+						condimentum vitae ut dui. Pellentesque pharetra nunc lectus, eget maximus orci hendrerit
+						at. Vestibulum pellentesque magna eu eros imperdiet, eget iaculis velit feugiat.
+						Interdum et malesuada fames ac ante ipsum primis in faucibus. In ultricies posuere sem
+						eget varius. Fusce at cursus ante, sed pellentesque enim. Duis eros massa, blandit nec
+						volutpat eu, facilisis vel enim.
+					</p>
+				</div>
 			</div>
 		{/each}
 	</div>
