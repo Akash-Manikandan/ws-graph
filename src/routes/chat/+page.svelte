@@ -22,6 +22,7 @@
 
 	const onSubmit = async () => {
 		chats.push({ role: 'User', message: question });
+		question = '';
 		setTimeout(() => {
 			chats.push({ role: 'SVCE AI', message: response });
 			console.log(chats);
@@ -53,14 +54,14 @@
 							: ' bg-[#EDABEF] text-black items-start')}
 					style="max-width: {maxWidth}px;"
 				>
-					<div class="text-2xl font-bold">
+					<div class="text-xl font-bold">
 						{#if index % 2 === 0}
 							<p class="">User</p>
 						{:else}
 							<p class="">SVCE AI</p>
 						{/if}
 					</div>
-					<p class="text-xl">
+					<p class={'text-lg ' + (index % 2 === 0 ? 'text-right' : 'text-left')}>
 						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin laoreet rhoncus est.
 						Curabitur a massa pulvinar, interdum nibh non, sodales turpis. Suspendisse pharetra
 						hendrerit efficitur. Mauris in enim elit. Cras purus magna, pulvinar et leo id,
