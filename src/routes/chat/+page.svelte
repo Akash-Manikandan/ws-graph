@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Chat } from './types';
+	import snarkdown from 'snarkdown'
 
 	let maxWidth = 0;
 
@@ -19,15 +20,26 @@
 	let question: string;
 	let chats: Chat[] = [];
 	let response: string = 'This is the response';
-
+	let disableInput: boolean = false;
 	const onSubmit = async () => {
-		chats.push({ role: 'User', message: question });
+		disableInput = true;
+		chats = [...chats, { role: 'User', message: question }];
+		const que = question
 		question = '';
-		setTimeout(() => {
-			chats.push({ role: 'SVCE AI', message: response });
-			console.log(chats);
-		}, 3000);
+		const response = await fetch("https://9de3-34-136-18-229.ngrok-free.app/chat/", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body : JSON.stringify({
+				question: que
+			})
+		})
+		const data = await response.json()
+		chats = [...chats, { role: 'SVCE AI', message: data.response }];
+		disableInput = false;
 	};
+
 </script>
 
 <svelte:window bind:innerHeight />
@@ -37,13 +49,6 @@
 		<p>Chat</p>
 	</nav>
 	<div class="top-0 h-14 w-full bg-[#111A21]"></div>
-	<!-- <div class="">
-		{#each chats as chat, index}
-			<p>{chat.role}</p>
-			<p>{chat.message}</p>
-		{/each}
-	</div> -->
-
 	<div class="h-full w-full flex flex-col">
 		{#each chats as chat, index (index)}
 			<div class={'flex w-full p-2 ' + (index % 2 === 0 ? 'justify-end ' : 'justify-start ')}>
@@ -55,15 +60,10 @@
 					style="max-width: {maxWidth}px;"
 				>
 					<div class="text-xl font-bold">
-						<!-- {#if index % 2 === 0}
-							<p class="">User</p>
-						{:else}
-							<p class="">SVCE AI</p>
-						{/if} -->
 						<p class="">{chat.role}</p>
 					</div>
 					<p class={'text-lg ' + (index % 2 === 0 ? 'text-right' : 'text-left')}>
-						{chat.message}
+						{@html chat.message}
 					</p>
 				</div>
 			</div>
@@ -77,8 +77,9 @@
 				placeholder="Enter query here"
 				class="w-full py-2 px-4 rounded-full text-xl bg-[#111A21] placeholder-[#EDABEFaa] border border-gray-300 text-[#EDABEF] focus:ring-blue-500 focus:border-blue-500 block"
 				bind:value={question}
+				disabled={disableInput}
 			/>
-			<button type="button" class="bg-[#EDABEF] rounded-full" on:click={onSubmit}>
+			<button type="button" disabled={disableInput} class="bg-[#EDABEF] rounded-full" on:click={onSubmit}>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="32"
