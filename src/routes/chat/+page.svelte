@@ -29,7 +29,7 @@
 			chats = [...chats, { role: 'User', message: question }];
 			const que = question;
 			question = '';
-			const response = await fetch('https://558a-34-123-18-217.ngrok-free.app/chat/', {
+			const response = await fetch('https://b1f3-34-123-18-217.ngrok-free.app/chat/', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
