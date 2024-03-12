@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Chat } from './types';
-	import snarkdown from 'snarkdown'
+	import MarkdownIt from 'markdown-it';
+
+	const md = new MarkdownIt();
+	const html = md.render('# Hello, Markdown!');
 
 	let maxWidth = 0;
 
@@ -21,25 +24,30 @@
 	let chats: Chat[] = [];
 	let response: string = 'This is the response';
 	let disableInput: boolean = false;
+
 	const onSubmit = async () => {
 		disableInput = true;
 		chats = [...chats, { role: 'User', message: question }];
-		const que = question
+		const que = question;
 		question = '';
-		const response = await fetch("https://9de3-34-136-18-229.ngrok-free.app/chat/", {
-			method: "POST",
+		const response = await fetch('https://9de3-34-136-18-229.ngrok-free.app/chat/', {
+			method: 'POST',
 			headers: {
-				"Content-Type": "application/json"
+				'Content-Type': 'application/json'
 			},
-			body : JSON.stringify({
+			body: JSON.stringify({
 				question: que
 			})
-		})
-		const data = await response.json()
+		});
+		const data = await response.json();
 		chats = [...chats, { role: 'SVCE AI', message: data.response }];
 		disableInput = false;
 	};
-
+	function handleKeyDown(event: any) {
+		if (event.key === 'Enter') {
+			onSubmit();
+		}
+	}
 </script>
 
 <svelte:window bind:innerHeight />
@@ -63,7 +71,7 @@
 						<p class="">{chat.role}</p>
 					</div>
 					<p class={'text-lg ' + (index % 2 === 0 ? 'text-right' : 'text-left')}>
-						{@html chat.message}
+						{@html md.render(chat.message)}
 					</p>
 				</div>
 			</div>
@@ -75,11 +83,18 @@
 			<input
 				type="text"
 				placeholder="Enter query here"
-				class="w-full py-2 px-4 rounded-full text-xl bg-[#111A21] placeholder-[#EDABEFaa] border border-gray-300 text-[#EDABEF] focus:ring-blue-500 focus:border-blue-500 block"
+				class={'w-full py-2 px-4 rounded-full text-xl bg-[#111A21] placeholder-[#EDABEFaa] border border-gray-300 text-[#EDABEF] focus:ring-blue-500 focus:border-blue-500 block ' +
+					(disableInput && 'cursor-not-allowed')}
 				bind:value={question}
 				disabled={disableInput}
+				on:keydown={handleKeyDown}
 			/>
-			<button type="button" disabled={disableInput} class="bg-[#EDABEF] rounded-full" on:click={onSubmit}>
+			<button
+				type="button"
+				disabled={disableInput}
+				class="bg-[#EDABEF] rounded-full"
+				on:click={onSubmit}
+			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="32"
