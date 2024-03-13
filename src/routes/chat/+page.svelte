@@ -103,8 +103,8 @@
 				<div
 					class={'flex flex-col w-fit max-w-96 p-2 gap-3 rounded-xl ' +
 						(index % 2 === 0
-							? 'bg-[#2b579a] text-white items-end'
-							: ' bg-[#EE972E] text-black items-start')}
+							? 'bg-[#2b579a] text-white items-end pl-4'
+							: ' bg-[#EE972E] text-black items-start pr-4')}
 					style="max-width: {maxWidth}px;"
 				>
 					<div class="text-xl font-bold">
@@ -117,7 +117,7 @@
 			</div>
 		{/each}
 	</div>
-	<div class="sticky w-full bg-white h-[5.5rem] bottom-0"></div>
+	<div class="sticky w-full bg-white h-[5.5rem] bottom-0 max-sm:h-[6.6rem]"></div>
 	<div class="fixed w-full bottom-0 flex flex-col justify-end">
 		{#if disableInput}
 			<div class="flex items-center gap-4 justify-center">
@@ -218,7 +218,7 @@
 				</div>
 			</div>
 		{/if}
-		<div class="w-full flex flex-col items-center px-2">
+		<div class="w-full flex flex-col items-center px-2 max-sm:text-center">
 			<div class="w-full flex items-center justify-between gap-3 mx-2 my-2">
 				<input
 					type="text"
@@ -248,10 +248,13 @@
 					>
 				</button>
 			</div>
-			<p class="text-sm mb-1">
-				SVCE AI can make mistakes. Consider checking important information at
-				<a class="underline" href="https://www.svce.ac.in/" target="_blank">www.svce.ac.in</a>
-			</p>
+			<div class="text-sm mb-1 flex gap-1 max-sm:flex-col max-sm:gap-0">
+				<p>SVCE AI can make mistakes.</p>
+				<div>
+					Consider checking important information at
+					<a class="underline" href="https://www.svce.ac.in/" target="_blank">www.svce.ac.in</a>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
