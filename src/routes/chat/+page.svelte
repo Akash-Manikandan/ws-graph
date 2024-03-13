@@ -51,7 +51,7 @@
 			chatHistory.set(chats);
 			const que = question;
 			question = '';
-			const response = await fetch('https://7c99-34-85-157-48.ngrok-free.app/chat/', {
+			const response = await fetch('https://77ff-35-230-25-190.ngrok-free.app/chat/', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -117,7 +117,7 @@
 			</div>
 		{/each}
 	</div>
-	<div class="sticky w-full bg-white h-14 bottom-0"></div>
+	<div class="sticky w-full bg-white h-[5.5rem] bottom-0"></div>
 	<div class="fixed w-full bottom-0 flex flex-col justify-end">
 		{#if disableInput}
 			<div class="flex items-center gap-4 justify-center">
@@ -218,34 +218,47 @@
 				</div>
 			</div>
 		{/if}
-		<div class="flex items-center justify-between gap-3 mx-2 my-2">
-			<input
-				type="text"
-				placeholder="Enter query here"
-				class={'w-full py-2 px-4 rounded-lg text-xl bg-[#fff] placeholder-[#111A21aa] border border-gray-300 text-[#111A21] focus:ring-[#2b579a] focus:border-[#2b579a] block ' +
-					(disableInput && 'cursor-not-allowed')}
-				bind:value={question}
-				disabled={disableInput}
-				on:keydown={handleKeyDown}
-			/>
-			<button
-				type="button"
-				disabled={disableInput}
-				class={'bg-[#EE972E] rounded-lg ' + (disableInput && 'cursor-not-allowed')}
-				on:click={onSubmit}
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="32"
-					height="32"
-					viewBox="0 0 24 24"
-					class="m-2"
-					><path
-						fill="#2b579a"
-						d="M4.4 19.425q-.5.2-.95-.088T3 18.5V14l8-2l-8-2V5.5q0-.55.45-.837t.95-.088l15.4 6.5q.625.275.625.925t-.625.925z"
-					/></svg
+		<div class="w-full flex flex-col items-center px-2">
+			<div class="w-full flex items-center justify-between gap-3 mx-2 my-2">
+				<input
+					type="text"
+					placeholder="Enter query here"
+					class={'w-full py-2 px-4 rounded-lg text-xl bg-[#fff] placeholder-[#111A21aa] border border-gray-300 text-[#111A21] focus:ring-[#2b579a] focus:border-[#2b579a] block ' +
+						(disableInput && 'cursor-not-allowed')}
+					bind:value={question}
+					disabled={disableInput}
+					on:keydown={handleKeyDown}
+				/>
+				<button
+					type="button"
+					disabled={disableInput}
+					class={'bg-[#EE972E] rounded-lg ' + (disableInput && 'cursor-not-allowed')}
+					on:click={onSubmit}
 				>
-			</button>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="32"
+						height="32"
+						viewBox="0 0 24 24"
+						class="m-2"
+						><path
+							fill="#2b579a"
+							d="M4.4 19.425q-.5.2-.95-.088T3 18.5V14l8-2l-8-2V5.5q0-.55.45-.837t.95-.088l15.4 6.5q.625.275.625.925t-.625.925z"
+						/></svg
+					>
+				</button>
+			</div>
+			<p class="text-sm mb-1">
+				SVCE AI can make mistakes. Consider checking important information at
+				<a class="underline" href="https://www.svce.ac.in/" target="_blank">www.svce.ac.in</a>
+			</p>
 		</div>
 	</div>
 </div>
+
+<style>
+	.chat-container {
+		overflow-y: auto;
+		height: 300px;
+	}
+</style>
