@@ -2,34 +2,56 @@
 	import { onMount } from 'svelte';
 	import type { Chat } from './types';
 	import MarkdownIt from 'markdown-it';
-
+	import { writable } from 'svelte/store';
 	const md = new MarkdownIt();
 
 	let maxWidth = 0;
 
-	onMount(() => {
-		maxWidth = Math.floor(window.innerWidth * 0.84);
-		const updateMaxWidth = () => {
-			maxWidth = Math.floor(window.innerWidth * 0.84);
-		};
-		window.addEventListener('resize', updateMaxWidth);
-		return () => {
-			window.removeEventListener('resize', updateMaxWidth);
-		};
-	});
+	let container: any;
+
+	// Function to scroll the container to the bottom
+	function scrollToBottom() {
+		if (container) {
+			container.scrollTop = container.scrollHeight;
+		}
+	}
+
+	$: {
+		scrollToBottom();
+	}
+
+	let chatHistory = writable<Chat[]>([]);
+	function fetchChatHistory() {
+		const storedHistory = localStorage.getItem('chatHistory');
+		if (storedHistory) {
+			chatHistory.set(JSON.parse(storedHistory));
+		}
+	}
 
 	let innerHeight: number;
 	let question: string;
 	let chats: Chat[] = [];
 	let disableInput: boolean = false;
 
+	function stripTextBeforeColon(text: string) {
+		const index = text.indexOf(':');
+		const beforeColon = text.substring(0, index).trim();
+		if (index !== -1 && beforeColon === 'SVCE AI') {
+			return text.substring(index + 1).trim();
+		} else {
+			return text;
+		}
+	}
+
 	const onSubmit = async () => {
-		if (question.trim().length != 0){
+		if (question.trim().length != 0) {
 			disableInput = true;
 			chats = [...chats, { role: 'User', message: question }];
+			localStorage.setItem('chatHistory', JSON.stringify(chats));
+			chatHistory.set(chats);
 			const que = question;
 			question = '';
-			const response = await fetch('https://b1f3-34-123-18-217.ngrok-free.app/chat/', {
+			const response = await fetch('https://7c99-34-85-157-48.ngrok-free.app/chat/', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -39,28 +61,44 @@
 				})
 			});
 			const data = await response.json();
-			chats = [...chats, { role: 'SVCE AI', message: data.response }];
+			const actualResponse = stripTextBeforeColon(data.response);
+			chats = [...chats, { role: 'SVCE AI', message: actualResponse }];
 			disableInput = false;
 		}
+		localStorage.setItem('chatHistory', JSON.stringify(chats));
+		chatHistory.set(chats);
 	};
+
 	function handleKeyDown(event: any) {
 		if (event.key === 'Enter') {
 			onSubmit();
 		}
 	}
+
+	onMount(() => {
+		fetchChatHistory();
+		scrollToBottom();
+		maxWidth = Math.floor(window.innerWidth * 0.84);
+		const updateMaxWidth = () => {
+			maxWidth = Math.floor(window.innerWidth * 0.84);
+		};
+		window.addEventListener('resize', updateMaxWidth);
+		return () => {
+			window.removeEventListener('resize', updateMaxWidth);
+		};
+	});
 </script>
 
 <svelte:window bind:innerHeight />
-<!-- style:height={`${innerHeight}px`} -->
 <div class="">
-	<nav class="fixed text-2xl h-14 top-0 w-full bg-[#fff] text-[#EE972E]">
+	<nav class="fixed text-2xl h-14 top-0 w-full bg-[#fff] text-[#EE972E] drop-shadow-md">
 		<div class="flex flex-row gap-3 items-center h-full">
-			<img src="/logo.png" width="140" height="90"  alt="logo"/>
+			<img src="/logo.png" width="140" height="90" alt="logo" />
 		</div>
 	</nav>
 	<div class="top-0 h-14 w-full bg-[#fff]"></div>
-	<div class="h-full w-full flex flex-col">
-		{#each chats as chat, index (index)}
+	<div class="h-full w-full flex flex-col" bind:this={container}>
+		{#each $chatHistory as chat, index (index)}
 			<div class={'flex w-full p-2 ' + (index % 2 === 0 ? 'justify-end ' : 'justify-start ')}>
 				<div
 					class={'flex flex-col w-fit max-w-96 p-2 gap-3 rounded-xl ' +
@@ -82,8 +120,10 @@
 	<div class="sticky w-full bg-white h-14 bottom-0"></div>
 	<div class="fixed w-full bottom-0 flex flex-col justify-end">
 		{#if disableInput}
-			<div class="flex items-center gap-4 justify-center  ">
-				<div class="w-fit flex items-center gap-4 justify-center bg-white drop-shadow-md p-2 rounded-lg">
+			<div class="flex items-center gap-4 justify-center">
+				<div
+					class="w-fit flex items-center gap-4 justify-center bg-white drop-shadow-md p-2 rounded-lg"
+				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="1em"
@@ -173,7 +213,8 @@
 								values="12;22;12"
 							/></rect
 						></svg
-					><p>Loading Response</p>
+					>
+					<p>Loading Response</p>
 				</div>
 			</div>
 		{/if}
@@ -181,7 +222,7 @@
 			<input
 				type="text"
 				placeholder="Enter query here"
-				class={'w-full py-2 px-4 rounded-lg text-xl bg-[#fff] placeholder-[#111A21aa] border border-gray-300 text-[#111A21] focus:ring-blue-500 focus:border-blue-500 block ' +
+				class={'w-full py-2 px-4 rounded-lg text-xl bg-[#fff] placeholder-[#111A21aa] border border-gray-300 text-[#111A21] focus:ring-[#2b579a] focus:border-[#2b579a] block ' +
 					(disableInput && 'cursor-not-allowed')}
 				bind:value={question}
 				disabled={disableInput}
@@ -190,7 +231,7 @@
 			<button
 				type="button"
 				disabled={disableInput}
-				class={"bg-[#EE972E] rounded-lg " + (disableInput && 'cursor-not-allowed')}
+				class={'bg-[#EE972E] rounded-lg ' + (disableInput && 'cursor-not-allowed')}
 				on:click={onSubmit}
 			>
 				<svg
