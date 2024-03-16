@@ -2,31 +2,10 @@
 	import { onMount } from 'svelte';
 	import type { Chat } from './types';
 	import MarkdownIt from 'markdown-it';
-	import { writable } from 'svelte/store';
 	const md = new MarkdownIt();
 
 	let maxWidth = 0;
 
-	let container: any;
-
-	// Function to scroll the container to the bottom
-	function scrollToBottom() {
-		if (container) {
-			container.scrollTop = container.scrollHeight;
-		}
-	}
-
-	$: {
-		scrollToBottom();
-	}
-
-	let chatHistory = writable<Chat[]>([]);
-	function fetchChatHistory() {
-		const storedHistory = localStorage.getItem('chatHistory');
-		if (storedHistory) {
-			chatHistory.set(JSON.parse(storedHistory));
-		}
-	}
 
 	let innerHeight: number;
 	let question: string;
@@ -46,14 +25,12 @@
 	const onSubmit = async () => {
 		if (question.trim().length != 0) {
 			disableInput = true;
-			chats = [...chats, { role: 'User', message: question }];
-			localStorage.setItem('chatHistory', JSON.stringify(chats));
-			chatHistory.set(chats);
-			const que = question;
+			chats = [...chats, { role: 'User', message: question.trim() }];
+			const que = question.trim();
 			question = '';
 
 			try {
-				const response = await fetch('https://6517-34-86-91-184.ngrok-free.app/chat/', {
+				const response = await fetch('https://bd27-34-86-91-184.ngrok-free.app/chat/', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json'
@@ -74,16 +51,14 @@
 						chats.pop();
 					}
 					answer += text;
-					chats = [...chats, { role: 'SVCE AI', message: answer }];
+					chats = [...chats, { role: 'SVCE AI', message: stripTextBeforeColon(answer) }];
+					window.scrollTo(0, document.body.scrollHeight);
 				}
 			} catch (error) {
 				console.error('Error fetching data:', error);
 			}
-			// const data = await response.json();
 			disableInput = false;
 		}
-		localStorage.setItem('chatHistory', JSON.stringify(chats));
-		chatHistory.set(chats);
 	};
 
 	function handleKeyDown(event: any) {
@@ -93,8 +68,6 @@
 	}
 
 	onMount(() => {
-		fetchChatHistory();
-		scrollToBottom();
 		maxWidth = Math.floor(window.innerWidth * 0.84);
 		const updateMaxWidth = () => {
 			maxWidth = Math.floor(window.innerWidth * 0.84);
@@ -114,8 +87,8 @@
 		</div>
 	</nav>
 	<div class="top-0 h-14 w-full bg-[#fff]"></div>
-	<div class="h-full w-full flex flex-col" bind:this={container}>
-		{#each $chatHistory as chat, index (index)}
+	<div class="h-full w-full flex flex-col" >
+		{#each chats as chat, index}
 			<div class={'flex w-full p-2 ' + (index % 2 === 0 ? 'justify-end ' : 'justify-start ')}>
 				<div
 					class={'flex flex-col w-fit max-w-96 p-2 gap-3 rounded-xl ' +
