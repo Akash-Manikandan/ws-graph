@@ -53,7 +53,7 @@
 			question = '';
 
 			try {
-				const response = await fetch('https://1251-35-199-33-181.ngrok-free.app/chat/', {
+				const response = await fetch('https://fcb9-34-86-91-184.ngrok-free.app/chat/', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json'
