@@ -74,7 +74,7 @@
 						chats.pop();
 					}
 					answer += text;
-					chats = [...chats, { role: 'SVCE AI', message: stripTextBeforeColon(answer) }];
+					chats = [...chats, { role: 'SVCE AI', message: answer }];
 				}
 			} catch (error) {
 				console.error('Error fetching data:', error);
