@@ -51,18 +51,35 @@
 			chatHistory.set(chats);
 			const que = question;
 			question = '';
-			const response = await fetch('https://77ff-35-230-25-190.ngrok-free.app/chat/', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					question: que.trim()
-				})
-			});
-			const data = await response.json();
-			const actualResponse = stripTextBeforeColon(data.response);
-			chats = [...chats, { role: 'SVCE AI', message: actualResponse }];
+
+			try {
+				const response = await fetch('https://1251-35-199-33-181.ngrok-free.app/chat/', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						question: que.trim()
+					})
+				});
+				const reader = response.body?.getReader();
+				const decoder = new TextDecoder();
+				let answer = '';
+				while (true && reader) {
+					const { done, value } = await reader.read();
+					if (done) break;
+
+					const text = decoder.decode(value);
+					if (chats[chats.length - 1].role == 'SVCE AI') {
+						chats.pop();
+					}
+					answer += text;
+					chats = [...chats, { role: 'SVCE AI', message: stripTextBeforeColon(answer) }];
+				}
+			} catch (error) {
+				console.error('Error fetching data:', error);
+			}
+			// const data = await response.json();
 			disableInput = false;
 		}
 		localStorage.setItem('chatHistory', JSON.stringify(chats));
@@ -218,6 +235,7 @@
 				</div>
 			</div>
 		{/if}
+
 		<div class="w-full flex flex-col items-center px-2 max-sm:text-center">
 			<div class="w-full flex items-center justify-between gap-3 mx-2 my-2">
 				<input
