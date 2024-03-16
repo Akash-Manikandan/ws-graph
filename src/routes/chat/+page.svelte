@@ -24,22 +24,39 @@
 	let disableInput: boolean = false;
 
 	const onSubmit = async () => {
-		if (question.trim().length != 0){
+		if (question.trim().length != 0) {
 			disableInput = true;
 			chats = [...chats, { role: 'User', message: question }];
 			const que = question;
 			question = '';
-			const response = await fetch('https://58be-34-136-18-229.ngrok-free.app/chat/', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					question: que.trim()
-				})
-			});
-			const data = await response.json();
-			chats = [...chats, { role: 'SVCE AI', message: data.response }];
+			try {
+				const response = await fetch('https://1251-35-199-33-181.ngrok-free.app/chat/', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						question: que.trim()
+					})
+				});
+				const reader = response.body?.getReader();
+				const decoder = new TextDecoder();
+				let answer = '';
+				while (true && reader) {
+					const { done, value } = await reader.read();
+					if (done) break;
+
+					const text = decoder.decode(value);
+					if (chats[chats.length - 1].role == 'SVCE AI') {
+						chats.pop();
+					}
+					answer += text;
+					chats = [...chats, { role: 'SVCE AI', message: answer }];
+				}
+			} catch (error) {
+				console.error('Error fetching data:', error);
+			}
+			// const data = await response.json();
 			disableInput = false;
 		}
 	};
@@ -55,7 +72,7 @@
 <div class="">
 	<nav class="fixed text-2xl h-14 top-0 w-full bg-[#fff] text-[#EE972E]">
 		<div class="flex flex-row gap-3 items-center h-full">
-			<img src="/logo.png" width="140" height="90"  alt="logo"/>
+			<img src="/logo.png" width="140" height="90" alt="logo" />
 		</div>
 	</nav>
 	<div class="top-0 h-14 w-full bg-[#fff]"></div>
@@ -82,8 +99,10 @@
 	<div class="sticky w-full bg-white h-14 bottom-0"></div>
 	<div class="fixed w-full bottom-0 flex flex-col justify-end">
 		{#if disableInput}
-			<div class="flex items-center gap-4 justify-center  ">
-				<div class="w-fit flex items-center gap-4 justify-center bg-white drop-shadow-md p-2 rounded-lg">
+			<div class="flex items-center gap-4 justify-center">
+				<div
+					class="w-fit flex items-center gap-4 justify-center bg-white drop-shadow-md p-2 rounded-lg"
+				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="1em"
@@ -173,7 +192,8 @@
 								values="12;22;12"
 							/></rect
 						></svg
-					><p>Loading Response</p>
+					>
+					<p>Loading Response</p>
 				</div>
 			</div>
 		{/if}
@@ -190,7 +210,7 @@
 			<button
 				type="button"
 				disabled={disableInput}
-				class={"bg-[#EE972E] rounded-lg " + (disableInput && 'cursor-not-allowed')}
+				class={'bg-[#EE972E] rounded-lg ' + (disableInput && 'cursor-not-allowed')}
 				on:click={onSubmit}
 			>
 				<svg
