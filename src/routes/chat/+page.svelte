@@ -3,7 +3,7 @@
 	import type { Chat } from './types';
 	import MarkdownIt from 'markdown-it';
 	const md = new MarkdownIt();
-
+	const mainUrl = "https://4b35-34-121-21-18.ngrok-free.app"
 	let maxWidth = 0;
 
 
@@ -29,7 +29,7 @@
 			const que = question.trim();
 			question = '';
 			try {
-				const response = await fetch('https://73f7-34-106-83-49.ngrok-free.app/chat/', {
+				const response = await fetch(`${mainUrl}/chat/`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json'
