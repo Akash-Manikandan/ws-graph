@@ -3,7 +3,7 @@
 	import type { Chat } from './types';
 	import MarkdownIt from 'markdown-it';
 	const md = new MarkdownIt();
-	const mainUrl = "https://4b35-34-121-21-18.ngrok-free.app"
+	const mainUrl = "https://561a-34-121-21-18.ngrok-free.app"
 	let maxWidth = 0;
 
 
@@ -76,13 +76,26 @@
 			window.removeEventListener('resize', updateMaxWidth);
 		};
 	});
+
+	async function clearData() {
+		const response = await fetch(`${mainUrl}/reset/`, {
+				headers: {
+					'Content-Type': 'application/json'
+				},
+			});
+		const data = await response.json();
+		console.log(data);
+	}
 </script>
 
 <svelte:window bind:innerHeight />
 <div class="">
 	<nav class="fixed text-2xl h-14 top-0 w-full bg-[#fff] text-[#EE972E] drop-shadow-md">
-		<div class="flex flex-row gap-3 items-center h-full">
+		<div class="flex flex-row justify-between gap-3 items-center h-full">
 			<img src="/logo.png" width="140" height="90" alt="logo" />
+			<button class="mx-4 px-1 py-1 rounded-lg cursor-pointer hover:bg-[#EE972E] hover:text-white" on:click={clearData}>
+				<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM8 9h8v10H8zm7.5-5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+			</button>
 		</div>
 	</nav>
 	<div class="top-0 h-14 w-full bg-[#fff]"></div>
